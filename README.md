@@ -40,7 +40,7 @@ chmod +x ~/.config/yazi/plugins/video-timeline.yazi/preview.sh
 
 Some Yazi installs do **not** create `~/.config/yazi/yazi.toml` until you make one.
 
-## If `~/.config/yazi/yazi.toml` already exists
+If `~/.config/yazi/yazi.toml` already exists
 
 Add this rule (preferably above other generic video previewers like `mediainfo`):
 
@@ -50,7 +50,7 @@ mime = "video/*"
 run = "video-timeline"
 ```
 
-## If `~/.config/yazi/yazi.toml` does NOT exist (create a minimal one)
+If `~/.config/yazi/yazi.toml` does NOT exist (create a minimal one)
 
 ```bash
 mkdir -p ~/.config/yazi
