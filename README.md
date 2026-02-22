@@ -86,6 +86,11 @@ Clear the cache directory:
 rm -rf /tmp/yazi-video-timeline
 ```
 
+## Inspiration / Thanks
+
+This plugin was inspired by the general script-driven preview approach used in the Yazi community, including the `preview.yazi` plugin by Urie96.
+This repository is a focused implementation for video timeline previews.
+
 ---
 
 ## License
