@@ -15,13 +15,14 @@ Works best in **kitty** (Yazi adapter: **Kgp**).
 - Yazi (recent)
 - Terminal with image support (**kitty** recommended)
 - `ffmpeg` (for `ffmpeg` + `ffprobe`)
+- `mediainfo` (recommended; nicer metadata output)
 - Optional: `ffmpegthumbnailer` (fallback thumbnail generator)
 
 Debian/Ubuntu/Mint:
 
 ```bash
 sudo apt update
-sudo apt install ffmpeg ffmpegthumbnailer
+sudo apt install ffmpeg ffmpegthumbnailer mediainfo
 ```
 
 ---
