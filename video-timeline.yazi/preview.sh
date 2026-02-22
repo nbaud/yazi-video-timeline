@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Nicolas Baudoin
 set -euo pipefail
 IFS=$'\n'
 
@@ -79,60 +81,12 @@ fi
 
 # Metadata (cached once per file version + settings)
 if [[ ! -s "$INFO" ]]; then
-  if have ffprobe; then
-    # Pull a few key fields (video + first audio stream)
-    # Then format them nicely with awk.
-    ffprobe -v error \
-      -select_streams v:0 \
-      -show_entries \
-        format=filename,format_name,duration,bit_rate:stream=codec_name,width,height,avg_frame_rate,r_frame_rate,display_aspect_ratio \
-      -of default=nw=1 -- "$FILE_PATH" 2>/dev/null \
-    | awk -F= '
-      function trim(s){ sub(/^[ \t\r\n]+/, "", s); sub(/[ \t\r\n]+$/, "", s); return s }
-      function fps(fr,   a,b){ split(fr,a,"/"); if(a[2]>0) return a[1]/a[2]; return fr }
-      function human_dur(sec,   s,m,h){
-        sec=int(sec+0.5); s=sec%60; m=int(sec/60)%60; h=int(sec/3600);
-        if(h>0) return sprintf("%dh%02dm%02ds",h,m,s);
-        return sprintf("%dm%02ds",m,s);
-      }
-      function human_br(b,   mb){ if(b==""||b==0) return "n/a"; mb=b/1000000; return sprintf("%.2f Mbps", mb) }
-
-      $1=="codec_name"{vcodec=$2}
-      $1=="width"{w=$2}
-      $1=="height"{h=$2}
-      $1=="display_aspect_ratio"{dar=$2}
-      $1=="avg_frame_rate"{avg=$2}
-      $1=="r_frame_rate"{rfr=$2}
-      $1=="duration"{dur=$2}
-      $1=="bit_rate"{br=$2}
-      $1=="format_name"{fmt=$2}
-      END{
-        if(dar=="") dar="n/a";
-        if(avg!="" && avg!="0/0") f=fps(avg); else f=fps(rfr);
-        printf("Video:   %s  |  %sx%s  |  DAR %s  |  %.2f fps\n", vcodec, w, h, dar, f);
-        printf("Length:  %s  |  Bitrate: %s  |  Container: %s\n", human_dur(dur), human_br(br), fmt);
-      }
-    ' >"$INFO" || true
-
-    # Add first audio stream info (optional)
-    ffprobe -v error \
-      -select_streams a:0 \
-      -show_entries stream=codec_name,channels,sample_rate,bit_rate \
-      -of default=nw=1 -- "$FILE_PATH" 2>/dev/null \
-    | awk -F= '
-      function human_hz(x){ if(x==""||x==0) return "n/a"; return sprintf("%.1f kHz", x/1000) }
-      function human_br(b,   kb){ if(b==""||b==0) return "n/a"; kb=b/1000; return sprintf("%.0f kbps", kb) }
-      $1=="codec_name"{ac=$2}
-      $1=="channels"{ch=$2}
-      $1=="sample_rate"{sr=$2}
-      $1=="bit_rate"{br=$2}
-      END{
-        if(ac!="") printf("Audio:   %s  |  %s ch  |  %s  |  %s\n", ac, ch, human_hz(sr), human_br(br));
-      }
-    ' >>"$INFO" || true
-
+  if have mediainfo; then
+    mediainfo "$FILE_PATH" >"$INFO" 2>/dev/null || true
+  elif have ffprobe; then
+    ffprobe -v error -show_format -show_streams -- "$FILE_PATH" >"$INFO" 2>/dev/null || true
   else
-    echo "ffprobe not found (install ffmpeg)" >"$INFO"
+    echo "Install mediainfo (recommended) or ffmpeg (ffprobe) for metadata." >"$INFO"
   fi
 fi
 
