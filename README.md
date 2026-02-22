@@ -36,7 +36,13 @@ cp -r video-timeline.yazi ~/.config/yazi/plugins/
 chmod +x ~/.config/yazi/plugins/video-timeline.yazi/preview.sh
 ```
 
-2) Enable it for videos in `~/.config/yazi/yazi.toml`:
+2) Enable the previewer in `yazi.toml`
+
+Some Yazi installs do **not** create `~/.config/yazi/yazi.toml` until you make one.
+
+## If `~/.config/yazi/yazi.toml` already exists
+
+Add this rule (preferably above other generic video previewers like `mediainfo`):
 
 ```toml
 [[plugin.prepend_previewers]]
@@ -44,7 +50,18 @@ mime = "video/*"
 run = "video-timeline"
 ```
 
-Put this rule **above** other generic video previewers (e.g. `mediainfo`) so it wins, or remove other previewers.
+## If `~/.config/yazi/yazi.toml` does NOT exist (create a minimal one)
+
+```bash
+mkdir -p ~/.config/yazi
+
+cat > ~/.config/yazi/yazi.toml <<'EOF'
+[plugin]
+prepend_previewers = [
+  { mime = "video/*", run = "video-timeline" },
+]
+EOF
+```
 
 3) Restart Yazi and hover a video file.
 
