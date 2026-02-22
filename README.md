@@ -78,14 +78,6 @@ rm -rf /tmp/yazi-video-timeline
 
 ## Troubleshooting
 
-### Check kitty image adapter is active
-
-```bash
-yazi --debug | sed -n '/Adapter/,+4p'
-```
-
-You want to see `Adapter.matches: Kgp`.
-
 ### If you ever see old thumbnails after changing settings
 
 Clear the cache directory:
